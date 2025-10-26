@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+<section class="relative flex items-center justify-center bg-cover bg-center py-24 sm:py-32 md:py-40"
+  style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('{% static "pedidos/img/hero.jpg" %}');">
+
+  <div class="container mx-auto px-4 text-center text-white">
+    <h1 class="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight">El Comilon</h1>
+    <p class="mt-4 max-w-2xl mx-auto text-lg sm:text-xl font-light">
+      Sabores combina la calidad del restaurante con el cariño de la comida casera.
+    </p>
+<div class="mt-8 flex justify-center items-center gap-6 flex-wrap text-center">
+  <a href="{% url 'pedidos:menu' %}" 
+     class="bg-orange-500 text-white px-8 py-3 rounded-lg font-bold shadow-md hover:bg-orange-600 transition-all">
+     Ver Menú
+  </a>
+
+  <a href="#" 
+     class="bg-white/90 text-stone-800 px-8 py-3 rounded-lg font-bold shadow-md hover:bg-stone-200 transition-all">
+     Servicios Corporativos
+  </a>
+</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="py-20 sm:py-24">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold text-stone-900">¿Por qué elegir Sabores?</h2>
+    <p class="mt-4 text-stone-600 max-w-2xl mx-auto">Comida real, ingredientes frescos y atención que te hace sentir en casa.</p>
+  </div>
+
+  <div class="mt-12 grid gap-8 md:grid-cols-3 container mx-auto px-4">
+    <div class="p-6 rounded-xl bg-white border border-stone-200 shadow hover:shadow-lg transition">
+      <span class="material-symbols-outlined text-4xl text-orange-500">outdoor_grill</span>
+      <h3 class="mt-3 text-xl font-bold text-stone-900">Sabor Casero</h3>
+      <p class="mt-2 text-stone-600">Comidas hechas con amor, como en casa.</p>
+    </div>
+
+    <div class="p-6 rounded-xl bg-white border border-stone-200 shadow hover:shadow-lg transition">
+      <span class="material-symbols-outlined text-4xl text-orange-500">eco</span>
+      <h3 class="mt-3 text-xl font-bold text-stone-900">Ingredientes Frescos</h3>
+      <p class="mt-2 text-stone-600">Cada plato está preparado con los mejores productos locales.</p>
+    </div>
+
+    <div class="p-6 rounded-xl bg-white border border-stone-200 shadow hover:shadow-lg transition">
+      <span class="material-symbols-outlined text-4xl text-orange-500">groups</span>
+      <h3 class="mt-3 text-xl font-bold text-stone-900">Para Toda Ocasión</h3>
+      <p class="mt-2 text-stone-600">Eventos, reuniones o tu almuerzo de todos los días.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

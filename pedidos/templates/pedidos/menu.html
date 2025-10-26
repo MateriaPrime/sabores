@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% load humanize %}
+
+{% block content %}
+<section class="py-10">
+  <div class="container mx-auto px-4">
+    <!-- Encabezado -->
+    <div class="text-center mb-10">
+      <p class="text-orange-500 font-semibold">Nuestros Menús</p>
+      <h1 class="text-3xl sm:text-4xl font-bold text-stone-900 mt-1">Delicias caseras de El Comilón</h1>
+      <p class="text-stone-600 mt-3 max-w-2xl mx-auto">
+        Comida casera con ingredientes frescos, servida en porciones generosas. Buen comer sin drama.
+      </p>
+    </div>
+
+    <!-- Tabs (decorativos) -->
+    <div class="flex justify-center gap-2 p-3 mb-8 border-b border-stone-200">
+      <span class="h-10 inline-flex items-center rounded-md bg-orange-500 text-white px-4 text-sm font-medium">Especiales</span>
+      <span class="h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium">Sopas</span>
+      <span class="h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium">Platos principales</span>
+      <span class="h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium">Postres</span>
+    </div>
+
+    {# ====== Bucle por categorías ====== #}
+    {% for categoria in categorias %}
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-stone-900 mb-6">{{ categoria.nombre }}</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for plato in categoria.platos.all %}
+            <article class="bg-white rounded-xl shadow-sm overflow-hidden border border-stone-200 group">
+              <!-- Imagen -->
+              <div class="relative w-full aspect-[16/9] overflow-hidden">
+                <img src="{% url 'pedidos:plato_imagen' plato.id %}"
+                    alt="{{ plato.nombre }}"
+                    class="w-full h-full object-cover">
+                {% if plato.destacado %}
+                  <span class="absolute left-3 top-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow">
+                    Destacado
+                  </span>
+                {% endif %}
+              </div>
+
+              <!-- Contenido -->
+              <div class="p-4 flex flex-col gap-2">
+                <h3 class="text-lg font-bold text-stone-900">{{ plato.nombre }}</h3>
+                <p class="text-sm text-stone-600 line-clamp-2">{{ plato.descripcion }}</p>
+
+                <div class="flex items-center justify-between mt-2">
+                  <p class="text-lg font-extrabold text-stone-900">
+                    ${{ plato.precio|intcomma }} 
+                  </p>
+                  <form method="post" action="{% url 'pedidos:add_to_cart' plato.id %}">
+                    {% csrf_token %}
+                    <button
+                      class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 transition-colors">
+                      <span class="material-symbols-outlined text-base">add_shopping_cart</span>
+                      Agregar
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          {% empty %}
+            <p class="text-stone-500">No hay platos en esta categoría.</p>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

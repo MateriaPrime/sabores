@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Tu carrito</h2>
+
+{% if items %}
+  <table>
+    <tr><th>Plato</th><th>Cant.</th><th>Subtotal</th><th></th></tr>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.plato.nombre }}</td>
+        <td>{{ it.cantidad }}</td>
+        <td>${{ it.subtotal|intcomma }}</td>
+        <td><a href="{% url 'pedidos:remove_from_cart' it.plato.id %}">Quitar</a></td>
+      </tr>
+    {% endfor %}
+    <tr><td colspan="2"><strong>Total</strong></td><td colspan="2"><strong>${{ total|intcomma }}</strong></td></tr>
+  </table>
+
+  <h3>Datos de entrega</h3>
+  <form method="post" action="{% url 'pedidos:checkout' %}">
+    {% csrf_token %}
+    <label>Nombre</label><input name="nombre" required>
+    <label>Teléfono</label><input name="telefono" required>
+    <label>Dirección</label><input name="direccion" required>
+    <button type="submit">Confirmar pedido</button>
+  </form>
+{% else %}
+  <p>Tu carrito está vacío. Qué triste.</p>
+{% endif %}
+{% endblock %}

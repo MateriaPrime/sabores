@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Tu orden</h2>
+<div class="order">
+  <p><strong>Orden #{{ pedido.id }}</strong></p>
+  <p>Tiempo estimado: {{ pedido.estimado_min }} - {{ pedido.estimado_max }} min</p>
+  <hr>
+  <h3>Resumen del pedido</h3>
+  <ul>
+    {% for it in pedido.items.all %}
+      <li>{{ it.plato.nombre }} — ${{ it.precio_unitario|intcomma }} x {{ it.cantidad }}</li>
+    {% endfor %}
+  </ul>
+  <p><strong>Total: ${{ pedido.total|intcomma }}</strong></p>
+  <p>Estado: {{ pedido.get_estado_display }}</p>
+</div>
+{% endblock %}

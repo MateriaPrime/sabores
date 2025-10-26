@@ -1,0 +1,32 @@
+/* Ajustes de Tailwind personalizados */
+
+body {
+  scroll-behavior: smooth;
+}
+
+/* Sombras más suaves */
+.shadow-lg {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+}
+
+/* Colores personalizados */
+.text-orange-500 {
+  color: #ff7a00 !important;
+}
+.bg-orange-500 {
+  background-color: #ff7a00 !important;
+}
+.bg-orange-600 {
+  background-color: #e56b00 !important;
+}
+.hover\:bg-orange-600:hover {
+  background-color: #e56b00 !important;
+}
+
+/* Ajuste del hero */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
