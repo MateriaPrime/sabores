@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'pedidos',
+    'pedidos.apps.PedidosConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +137,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Para demo
 DEBUG = True
 ALLOWED_HOSTS = []
+
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard_router'  
+LOGOUT_REDIRECT_URL = 'pedidos:home'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@sabores.local'

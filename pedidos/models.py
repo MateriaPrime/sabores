@@ -1,4 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+class Perfil(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    direccion = models.CharField(max_length=250, blank=True)
+    telefono = models.CharField(max_length=30, blank=True)
+
+    def __str__(self):
+        return f'Perfil de {self.user.username}'
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=60)
@@ -21,6 +30,7 @@ class Plato(models.Model):
     def __str__(self): return self.nombre
 
 class Pedido(models.Model):
+    usuario = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='pedidos')
     ESTADOS = [('PREP','Preparando'), ('CAM','En camino'), ('ENT','Entregado')]
     nombre = models.CharField(max_length=120)
     telefono = models.CharField(max_length=30)

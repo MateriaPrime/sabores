@@ -16,10 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+from pedidos import views_auth
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('pedidos.urls')),  # rutas de la app
+    path('', include('pedidos.urls')),
+
+    path('login/', views_auth.SaboresLoginView.as_view(), name='login'),
+    path('logout/', views_auth.logout_view, name='logout'),
+    path('dashboard/', views_auth.dashboard_router, name='dashboard_router'),
+
+    # password reset
+    path('password-reset/', views_auth.ResetPasswordView.as_view(), name='password_reset'),
+    path('password-reset/done/', views_auth.ResetPasswordDoneView.as_view(), name='password_reset_done'),
+    path('password-reset/confirm/<uidb64>/<token>/', views_auth.ResetPasswordConfirmView.as_view(), name='password_reset_confirm'),
+    path('password-reset/complete/', views_auth.ResetPasswordCompleteView.as_view(), name='password_reset_complete'),
 ]

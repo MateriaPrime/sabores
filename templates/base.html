@@ -39,7 +39,22 @@
 
           <div class="flex items-center gap-3">
             <a href="{% url 'pedidos:menu' %}" class="hidden sm:flex bg-orange-500 text-white px-5 h-11 rounded-lg font-bold shadow hover:bg-orange-600 transition">Ordenar</a>
-            <a href="#" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">Ingresar</a>
+
+            {% if request.user.is_authenticated %}
+              <!-- Usuario logueado: muestra nombre, Mi Panel y Salir -->
+              <span class="hidden sm:inline text-sm text-stone-700">Hola, <strong>{{ request.user.username }}</strong></span>
+              <a href="{% url 'dashboard_router' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
+                Mi Panel
+              </a>
+              <a href="{% url 'logout' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
+                Salir
+              </a>
+            {% else %}
+              <!-- Invitado: muestra Ingresar -->
+              <a href="{% url 'login' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
+                Ingresar
+              </a>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -53,7 +68,7 @@
     <!-- FOOTER -->
     <footer class="bg-stone-100 border-t border-stone-200 py-8">
       <div class="container mx-auto px-4 text-center text-stone-500 text-sm">
-        <p>© {{ now|date:"Y" }} Sabores. Todos los derechos reservados.</p>
+        <p>© {% now "Y" %} Sabores. Todos los derechos reservados.</p>
       </div>
     </footer>
   </div>
