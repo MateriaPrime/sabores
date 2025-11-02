@@ -3,6 +3,24 @@ from django.contrib import messages
 from .models import Categoria, Plato, Pedido, ItemPedido
 from django.http import HttpResponse, Http404
 
+class MockPlatoManager:
+    """Simula el manager .platos.all() de Django."""
+    def __init__(self, platos_list):
+        self.platos_list = platos_list
+    def all(self):
+        return self.platos_list
+
+class MockCategoria:
+    """Simula un objeto Categoria para un filtro específico."""
+    def __init__(self, nombre, platos_list):
+        self.nombre = nombre
+        self.platos = MockPlatoManager(platos_list)
+        
+    def __str__(self): return self.nombre
+    
+    @property
+    def pk(self): return 0
+
 
 def _get_cart(request):
     """
@@ -11,12 +29,27 @@ def _get_cart(request):
     return request.session.setdefault('cart', {})
 
 def home(request):
-    # Pagina de portada (hero, features)
     return render(request, 'pedidos/home.html')
 
 def menu(request):
-    categorias = Categoria.objects.prefetch_related('platos').all()
-    return render(request, 'pedidos/menu.html', {'categorias': categorias})
+    current_tab = request.GET.get('tab', 'Especiales')
+    
+    dish_filters = {
+        'Sopas': ['Cazuela de vacuno', 'Sopa de mariscos'],
+        'Platos principales': ['Tallarines con salsa', 'Porotos con rienda'],
+        'Postres': ['Mousse de chocolate', 'Pie de limón'],
+    }
+
+    if current_tab == 'Especiales':
+        menu_data = Categoria.objects.prefetch_related('platos').all()
+    else:
+        required_dish_names = dish_filters.get(current_tab, [])
+        
+        filtered_platos = Plato.objects.filter(nombre__in=required_dish_names)
+
+        menu_data = [MockCategoria(nombre=current_tab, platos_list=list(filtered_platos))]
+    
+    return render(request, 'pedidos/menu.html', {'categorias': menu_data})
 
 def add_to_cart(request, plato_id):
     cart = _get_cart(request)
@@ -66,7 +99,6 @@ def checkout(request):
                 pedido=pedido, plato=plato, cantidad=cant, precio_unitario=plato.precio
             )
 
-        # vaciar carrito
         request.session['cart'] = {}
         request.session.modified = True
         return redirect('pedidos:order_detail', pedido_id=pedido.id)

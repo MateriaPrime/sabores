@@ -6,7 +6,6 @@
 {% block content %}
 <section class="py-10">
   <div class="container mx-auto px-4">
-    <!-- Encabezado -->
     <div class="text-center mb-10">
       <p class="text-orange-500 font-semibold">Nuestros Menús</p>
       <h1 class="text-3xl sm:text-4xl font-bold text-stone-900 mt-1">Delicias caseras de El Comilón</h1>
@@ -15,15 +14,36 @@
       </p>
     </div>
 
-    <!-- Tabs (decorativos) -->
-    <div class="flex justify-center gap-2 p-3 mb-8 border-b border-stone-200">
-      <span class="h-10 inline-flex items-center rounded-md bg-orange-500 text-white px-4 text-sm font-medium">Especiales</span>
-      <span class="h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium">Sopas</span>
-      <span class="h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium">Platos principales</span>
-      <span class="h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium">Postres</span>
+    <div class="flex justify-center gap-2 p-3 mb-8 border-b border-stone-200" id="menu-tabs">
+      <a href="{% url 'pedidos:menu' %}?tab=Especiales" class="tab-button h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium transition-colors">Especiales</a>
+      <a href="{% url 'pedidos:menu' %}?tab=Sopas" class="tab-button h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium transition-colors">Sopas</a>
+      <a href="{% url 'pedidos:menu' %}?tab=Platos principales" class="tab-button h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium transition-colors">Platos principales</a>
+      <a href="{% url 'pedidos:menu' %}?tab=Postres" class="tab-button h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium transition-colors">Postres</a>
     </div>
 
-    {# ====== Bucle por categorías ====== #}
+    {# Lógica para resaltar la pestaña activa con color naranja #}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('#menu-tabs .tab-button');
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const currentTab = urlParams.get('tab') || 'Especiales';
+        
+        tabs.forEach(tab => {
+          const tabName = new URL(tab.href).searchParams.get('tab');
+          
+          if (tabName === currentTab) {
+            tab.classList.remove('bg-white', 'text-stone-700');
+            tab.classList.add('bg-orange-500', 'text-white');
+          } else {
+            tab.classList.remove('bg-orange-500', 'text-white');
+            tab.classList.add('bg-white', 'text-stone-700');
+          }
+        });
+      });
+    </script>
+    
+    {# ====== Bucle por categorías (ahora solo mostrará la categoría filtrada) ====== #}
     {% for categoria in categorias %}
       <section class="mb-12">
         <h2 class="text-2xl font-bold text-stone-900 mb-6">{{ categoria.nombre }}</h2>
@@ -31,7 +51,6 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {% for plato in categoria.platos.all %}
             <article class="bg-white rounded-xl shadow-sm overflow-hidden border border-stone-200 group">
-              <!-- Imagen -->
               <div class="relative w-full aspect-[16/9] overflow-hidden">
                 <img src="{% url 'pedidos:plato_imagen' plato.id %}"
                     alt="{{ plato.nombre }}"
@@ -43,7 +62,6 @@
                 {% endif %}
               </div>
 
-              <!-- Contenido -->
               <div class="p-4 flex flex-col gap-2">
                 <h3 class="text-lg font-bold text-stone-900">{{ plato.nombre }}</h3>
                 <p class="text-sm text-stone-600 line-clamp-2">{{ plato.descripcion }}</p>
