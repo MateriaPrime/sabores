@@ -4,7 +4,11 @@
   <h1 class="text-2xl font-bold mb-4">Crear cuenta (Cliente)</h1>
   <form method="post" class="space-y-4">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    
+    {# Muestra errores no relacionados a campos, como error de formularios genéricos #}
+    {% if form.non_field_errors %}
+      <div class="p-3 bg-red-100 border border-red-400 text-red-700 rounded mb-4">{{ form.non_field_errors }}</div>
+    {% endif %}
 
     <div><label>Usuario</label>{{ form.username }}</div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -14,8 +18,36 @@
     <div><label>Dirección</label>{{ form.direccion }}</div>
     <div><label>Teléfono</label>{{ form.telefono }}</div>
 
-    <div><label>Contraseña</label>{{ form.password1 }}</div>
-    <div><label>Confirmar contraseña</label>{{ form.password2 }}</div>
+    {# CONTRASEÑA 1: Muestra el campo, sus errores y el help_text #}
+    <div>
+        <label>Contraseña</label>
+        {{ form.password1 }}
+        {# Muestra los errores de validación de contraseña (e.g., no cumple requisitos) #}
+        {% if form.password1.errors %}
+            <div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded">
+                {% for error in form.password1.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if form.password1.help_text %}
+            <p class="text-xs text-stone-500 mt-1">{{ form.password1.help_text }}</p>
+        {% endif %}
+    </div>
+
+    {# CONTRASEÑA 2: Muestra el campo y sus errores (e.g., no coinciden) #}
+    <div>
+        <label>Confirmar contraseña</label>
+        {{ form.password2 }}
+        {# Muestra los errores de confirmación de contraseña (e.g., no coinciden) #}
+        {% if form.password2.errors %}
+            <div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded">
+                {% for error in form.password2.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 
     <button class="bg-orange-500 text-white px-4 py-2 rounded">Crear</button>
   </form>
