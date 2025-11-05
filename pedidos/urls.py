@@ -17,4 +17,7 @@ urlpatterns = [
     path('mi-cuenta/', views_roles.dash_cliente, name='dash_cliente'),
     path('repartidor/', views_roles.dash_repartidor, name='dash_repartidor'),
     path('signup/cliente/', views_roles.signup_cliente, name='signup_cliente'),
+    path('plato/crear/', views_roles.plato_crear, name='plato_crear'),
+    path('plato/editar/<int:pk>/', views_roles.plato_editar, name='plato_editar'),
+    path('plato/eliminar/<int:pk>/', views_roles.plato_eliminar, name='plato_eliminar'),
 ]

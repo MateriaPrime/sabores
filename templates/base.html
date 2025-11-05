@@ -38,7 +38,7 @@
           </nav>
 
           <div class="flex items-center gap-3">
-            <a href="{% url 'pedidos:menu' %}" class="hidden sm:flex bg-orange-500 text-white px-5 h-11 rounded-lg font-bold shadow hover:bg-orange-600 transition">Ordenar</a>
+            <a href="{% url 'pedidos:menu' %}" class="hidden sm:flex items-center bg-orange-500 text-white px-5 h-11 rounded-lg font-bold shadow hover:bg-orange-600 transition">Ordenar</a>
 
             {% if request.user.is_authenticated %}
               <!-- Usuario logueado: muestra nombre, Mi Panel y Salir -->

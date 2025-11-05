@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="container mx-auto max-w-lg p-8 my-10 bg-white shadow-lg rounded-lg">
+  
+  <h1 class="text-3xl font-bold mb-4 text-center text-gray-800">Confirmar Eliminación</h1>
+  
+  <p class="text-center text-lg text-gray-700 mb-6">
+    ¿Estás seguro de que quieres eliminar el plato:
+    <br>
+    <strong class="font-bold text-red-600">{{ plato.nombre }}</strong>?
+  </p>
+
+  <p class="text-center text-sm text-gray-500 mb-8">
+    Esta acción no se puede deshacer.
+  </p>
+
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    
+    <div class="grid grid-cols-2 gap-4">
+      <a href="{% url 'pedidos:menu' %}" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
+        Cancelar
+      </a>
+      
+      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+        Sí, eliminar
+      </button>
+    </div>
+  </form>
+
+</section>
+{% endblock %}

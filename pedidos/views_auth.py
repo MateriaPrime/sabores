@@ -30,7 +30,7 @@ def dashboard_router(request):
         return redirect('login')
     u = request.user
     if u.is_superuser or u.is_staff:
-        return redirect('/admin/')
+        return redirect('pedidos:menu') # Redirige al menú principal
     if u.groups.filter(name='REPARTIDOR').exists():
         return redirect(reverse('pedidos:dash_repartidor'))
     return redirect(reverse('pedidos:dash_cliente'))

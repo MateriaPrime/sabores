@@ -12,7 +12,16 @@
       <p class="text-stone-600 mt-3 max-w-2xl mx-auto">
         Comida casera con ingredientes frescos, servida en porciones generosas. Buen comer sin drama.
       </p>
-    </div>
+
+      {% if user.is_superuser %}
+      <div class="mt-6">
+        <a href="{% url 'pedidos:plato_crear' %}" class="inline-flex items-center gap-2 rounded-md h-11 px-6 bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors shadow">
+          <span class="material-symbols-outlined text-base">add_circle</span>
+          Añadir Nuevo Plato
+        </a>
+      </div>
+      {% endif %}
+      </div>
 
     <div class="flex justify-center gap-2 p-3 mb-8 border-b border-stone-200" id="menu-tabs">
       <a href="{% url 'pedidos:menu' %}?tab=Especiales" class="tab-button h-10 inline-flex items-center rounded-md bg-white text-stone-700 px-4 text-sm font-medium transition-colors">Especiales</a>
@@ -51,8 +60,8 @@
             <article class="bg-white rounded-xl shadow-sm overflow-hidden border border-stone-200 group">
               <div class="relative w-full aspect-[16/9] overflow-hidden">
                 <img src="{% url 'pedidos:plato_imagen' plato.id %}"
-                    alt="{{ plato.nombre }}"
-                    class="w-full h-full object-cover">
+                     alt="{{ plato.nombre }}"
+                     class="w-full h-full object-cover">
                 {% if plato.destacado %}
                   <span class="absolute left-3 top-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow">
                     Destacado
@@ -68,15 +77,29 @@
                   <p class="text-lg font-extrabold text-stone-900">
                     ${{ plato.precio|intcomma }} 
                   </p>
-                  <form method="post" action="{% url 'pedidos:add_to_cart' plato.id %}">
-                    {% csrf_token %}
-                    <button
-                      class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 transition-colors">
-                      <span class="material-symbols-outlined text-base">add_shopping_cart</span>
-                      Agregar
-                    </button>
-                  </form>
-                </div>
+
+                  {% if user.is_superuser %}
+                    <div class="flex items-center gap-2">
+                      <a href="{% url 'pedidos:plato_editar' plato.id %}" class="inline-flex items-center gap-1 rounded-md h-9 px-3 bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition-colors">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                        Editar
+                      </a>
+                      <a href="{% url 'pedidos:plato_eliminar' plato.id %}" class="inline-flex items-center gap-1 rounded-md h-9 px-3 bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-colors">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                        Eliminar
+                      </a>
+                    </div>
+                  {% else %}
+                    <form method="post" action="{% url 'pedidos:add_to_cart' plato.id %}">
+                      {% csrf_token %}
+                      <button
+                        class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 transition-colors">
+                        <span class="material-symbols-outlined text-base">add_shopping_cart</span>
+                        Agregar
+                      </button>
+                    </form>
+                  {% endif %}
+                  </div>
               </div>
             </article>
           {% empty %}
