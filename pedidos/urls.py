@@ -20,4 +20,7 @@ urlpatterns = [
     path('plato/crear/', views_roles.plato_crear, name='plato_crear'),
     path('plato/editar/<int:pk>/', views_roles.plato_editar, name='plato_editar'),
     path('plato/eliminar/<int:pk>/', views_roles.plato_eliminar, name='plato_eliminar'),
+    path('signup/repartidor/', views_roles.signup_repartidor, name='signup_repartidor'),
+    path('repartidor/aceptar/<int:pedido_id>/', views_roles.pedido_aceptar, name='pedido_aceptar'),
+    path('repartidor/entregado/<int:pedido_id>/', views_roles.pedido_entregado, name='pedido_entregado'),
 ]

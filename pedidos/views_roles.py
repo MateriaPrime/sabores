@@ -8,7 +8,7 @@ from .forms import SignupClienteForm
 from .models import Pedido 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .forms import SignupClienteForm, PlatoAdminForm # Importamos PlatoAdminForm
+from .forms import SignupClienteForm, PlatoAdminForm, SignupRepartidorForm # Importamos PlatoAdminForm
 from .models import Pedido, Plato # Importamos Plato
 
 def signup_cliente(request):
@@ -37,8 +37,56 @@ def is_repartidor(u):
 @login_required
 @user_passes_test(is_repartidor)
 def dash_repartidor(request):
-    # Aquí solo entran REPARTIDORES
-    return render(request, 'pedidos/dash_repartidor.html')
+    # Lógica para el panel del repartidor
+    
+    # 1. Pedidos disponibles (en preparación y sin repartidor asignado)
+    pedidos_disponibles = Pedido.objects.filter(
+        estado='PREP', 
+        repartidor__isnull=True
+    ).prefetch_related('items__plato').order_by('creado')
+
+    # 2. Mis pedidos (los que acepté y están 'En camino')
+    mis_pedidos = Pedido.objects.filter(
+        repartidor=request.user, 
+        estado='CAM'
+    ).prefetch_related('items__plato').order_by('creado')
+    
+    context = {
+        'pedidos_disponibles': pedidos_disponibles,
+        'mis_pedidos_aceptados': mis_pedidos
+    }
+    return render(request, 'pedidos/dash_repartidor.html', context)
+
+@login_required
+@user_passes_test(is_repartidor)
+def pedido_aceptar(request, pedido_id):
+    """
+    Esta vista se activa cuando un repartidor presiona "Aceptar".
+    """
+    pedido = get_object_or_404(Pedido, id=pedido_id, estado='PREP', repartidor__isnull=True)
+    
+    # Asignamos el pedido al repartidor actual y cambiamos el estado
+    pedido.repartidor = request.user
+    pedido.estado = 'CAM' # 'CAM' = En Camino
+    pedido.save()
+    
+    messages.success(request, f"Pedido #{pedido.id} aceptado. ¡En camino!")
+    return redirect('pedidos:dash_repartidor')
+
+@login_required
+@user_passes_test(is_repartidor)
+def pedido_entregado(request, pedido_id):
+    """
+    Esta vista se activa cuando un repartidor presiona "Marcar como Entregado".
+    """
+    # Buscamos un pedido que me pertenezca a MÍ y esté 'En Camino'
+    pedido = get_object_or_404(Pedido, id=pedido_id, repartidor=request.user, estado='CAM')
+    
+    pedido.estado = 'ENT' # 'ENT' = Entregado
+    pedido.save()
+    
+    messages.success(request, f"Pedido #{pedido.id} marcado como entregado.")
+    return redirect('pedidos:dash_repartidor')
 
 def is_admin(u):
     """ Helper para chequear si el usuario es superuser """
@@ -97,4 +145,20 @@ def plato_eliminar(request, pk):
     
     # Si es GET, mostramos la página de confirmación
     return render(request, 'pedidos/plato_confirm_delete.html', {'plato': plato})
-# --- FIN DE LAS NUEVAS VISTAS ---
+
+# VISTA DE REGISTRO PARA REPARTIDORES
+def signup_repartidor(request):
+    if request.method == 'POST':
+        form = SignupRepartidorForm(request.POST) # Usa el nuevo formulario
+        if form.is_valid():
+            user = form.save()
+            # Asigna al grupo 'REPARTIDOR'
+            repartidor_group, _ = Group.objects.get_or_create(name='REPARTIDOR')
+            user.groups.add(repartidor_group)
+            
+            login(request, user) # Inicia sesión
+            return redirect('dashboard_router') # Lo manda al router
+    else:
+        form = SignupRepartidorForm() # Muestra el formulario vacío
+    
+    return render(request, 'pedidos/signup_repartidor.html', {'form': form})
