@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="container mx-auto max-w-4xl p-8 my-10 bg-white shadow-lg rounded-lg">
+  
+  <div class="text-center">
+    <h1 class="text-3xl font-bold mb-4 text-gray-800">Sobre Nosotros</h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      Más que un restaurante, somos un equipo apasionado por la comida casera y los ingredientes frescos.
+    </p>
+  </div>
+
+  <hr class="my-8 border-gray-200">
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    
+    <div class="text-gray-700 space-y-4">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-3">Nuestra Pasión: Sabor Casero</h2>
+      <p>
+        En "Sabores", creemos que la mejor comida es la que se prepara con cariño, como en casa. Nos asociamos con "El Comilón" y otros cocineros locales para llevarte platos abundantes, preparados con ingredientes frescos de la zona.
+      </p>
+      <p>
+        Nuestro compromiso es simple: comida real, porciones generosas y un servicio que te haga sentir en familia.
+      </p>
+      
+      <h3 class="text-xl font-semibold text-gray-800 pt-4">Eventos y Corporativo</h3>
+      <p>
+        ¿Quieres llevar el sabor de "El Comilón" a tu oficina o evento? Ofrecemos planes especiales para empresas y celebraciones. Escríbenos a <strong class="text-orange-600">pedidos@sabores.cl</strong> para cotizar.
+      </p>
+    </div>
+
+    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Información</h2>
+      
+      <ul class="space-y-4">
+        <li class="flex items-start">
+          <span class="material-symbols-outlined text-orange-600 mr-3 mt-1">schedule</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">Horarios de Atención</h4>
+            <p class="text-gray-600">Lunes a Viernes: 11:00am - 10:00pm</p>
+            <p class="text-gray-600">Sábados y Domingos: 12:00pm - 11:00pm</p>
+          </div>
+        </li>
+        
+        <li class="flex items-start">
+          <span class="material-symbols-outlined text-orange-600 mr-3 mt-1">call</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">Teléfono</h4>
+            <p class="text-gray-600">+56 32 2 123 456</p>
+          </div>
+        </li>
+        
+        <li class="flex items-start">
+          <span class="material-symbols-outlined text-orange-600 mr-3 mt-1">alternate_email</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">Email de Pedidos</h4>
+            <p class="text-gray-600">pedidos@sabores.cl</p>
+          </div>
+        </li>
+        
+        <li class="flex items-start">
+          <span class="material-symbols-outlined text-orange-600 mr-3 mt-1">location_on</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">Nuestra Cocina Central</h4>
+            <p class="text-gray-600">Av. del Sabor 123, Viña del Mar, Chile</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+{% endblock %}

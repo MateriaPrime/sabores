@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load humanize %} {% block content %}
+<section class="container mx-auto max-w-3xl p-8 my-10">
+  
+  <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Reseñas de Nuestros Clientes</h1>
+
+  {% if user.is_authenticated %}
+    <div class="bg-white p-6 shadow-lg rounded-lg mb-10">
+      <h2 class="text-2xl font-semibold mb-4">¡Deja tu reseña, {{ user.first_name|default:user.username }}!</h2>
+      
+      {% if messages %}
+        {% for message in messages %}
+          <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div>
+          <label for="{{ form.estrellas.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.estrellas.label }}</label>
+          <div class="mt-1">{{ form.estrellas }}</div>
+          {% if form.estrellas.errors %}<div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded-md">{{ form.estrellas.errors }}</div>{% endif %}
+        </div>
+        
+        <div>
+          <label for="{{ form.comentario.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.comentario.label }}</label>
+          <div class="mt-1">{{ form.comentario }}</div>
+          {% if form.comentario.errors %}<div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded-md">{{ form.comentario.errors }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+          Enviar Reseña
+        </button>
+      </form>
+    </div>
+  {% else %}
+    <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-10 text-center">
+      ¿Quieres dejar tu reseña? 
+      <a href="{% url 'login' %}" class="font-bold underline hover:text-blue-600">Inicia sesión</a> 
+      para contarnos tu experiencia.
+    </div>
+  {% endif %}
+
+  <div class_ ="space-y-6">
+    {% for reseña in reseñas %}
+      <article class="bg-white p-5 shadow rounded-lg border border-gray-200">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ reseña.usuario.first_name|default:reseña.usuario.username }}
+          </h3>
+          <span class="text-sm text-gray-500">{{ reseña.creado|naturaltime }}</span>
+        </div>
+        <p class="text-yellow-500 text-lg font-bold mb-2">{{ reseña.get_estrellas_display }}</p>
+        <p class="text-gray-700">
+          {{ reseña.comentario }}
+        </p>
+      </article>
+    {% empty %}
+      <div class="bg-white p-6 shadow rounded-lg text-center">
+        <p class="text-gray-500">Aún no hay reseñas. ¡Sé el primero en dejar una!</p>
+      </div>
+    {% endfor %}
+  </div>
+
+</section>
+{% endblock %}

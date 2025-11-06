@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Categoria, Plato, Pedido, ItemPedido
+from .models import Categoria, Plato, Pedido, ItemPedido, ItemPedido, Reseña
+from .forms import ReseñaForm
 from django.http import HttpResponse, Http404
 
 def _get_cart(request):
@@ -67,6 +68,45 @@ def menu(request):
         menu_data = Categoria.objects.prefetch_related('platos').filter(nombre=current_tab)
     
     return render(request, 'pedidos/menu.html', {'categorias': menu_data})
+
+def contacto(request):
+    """
+    Muestra la página estática de 'Contacto' con la
+    información del restaurante.
+    """
+    return render(request, 'pedidos/contacto.html')
+
+def reseñas(request):
+    """
+    Muestra la lista de reseñas y permite a usuarios
+    autenticados enviar una nueva.
+    """
+    form = ReseñaForm()
+    
+    if request.method == 'POST':
+        # Solo procesamos el formulario si el usuario está logueado
+        if not request.user.is_authenticated:
+            return redirect('login') 
+            
+        form = ReseñaForm(request.POST)
+        if form.is_valid():
+            # Guardamos la reseña pero sin enviarla a la BD todavía
+            reseña = form.save(commit=False) 
+            # Asignamos el usuario actual
+            reseña.usuario = request.user 
+            reseña.save() # Ahora sí la guardamos
+            
+            messages.success(request, '¡Gracias por tu reseña!')
+            return redirect('pedidos:reseñas')
+
+    # Para todos (GET y POST fallido), mostramos la lista de reseñas
+    lista_reseñas = Reseña.objects.all().order_by('-creado')
+    
+    context = {
+        'reseñas': lista_reseñas,
+        'form': form
+    }
+    return render(request, 'pedidos/reseñas.html', context)
 
 
 def checkout(request):
