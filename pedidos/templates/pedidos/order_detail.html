@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<section class="container mx-auto max-w-2xl p-8 my-10 bg-white shadow-lg rounded-lg">
+  
+  <div class="text-center">
+    <span class="text-6xl">🎉</span>
+    <h1 class="text-3xl font-bold mt-4 text-gray-800">¡Pedido Confirmado!</h1>
+    <p class="text-lg text-gray-600 mt-2">Gracias por tu compra, {{ pedido.nombre }}.</p>
+    <p class="text-gray-500">Tu pedido <strong class="text-gray-900">#{{ pedido.id }}</strong> está en preparación.</p>
+  </div>
+
+  <div class="border-t border-b border-gray-200 my-8 py-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Resumen de tu Orden</h2>
+    
+    <div class="mb-4">
+      <h3 class="text-lg font-medium text-gray-800">Datos de Entrega</h3>
+      <p class="text-gray-600"><strong>Cliente:</strong> {{ pedido.nombre }}</p>
+      <p class="text-gray-600"><strong>Teléfono:</strong> {{ pedido.telefono }}</p>
+      <p class="text-gray-600"><strong>Dirección:</strong> {{ pedido.direccion }}</p>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-medium text-gray-800 mb-2">Platos Ordenados</h3>
+      <ul class="space-y-3">
+        {% for item in pedido.items.all %}
+          <li class="flex justify-between items-center text-sm">
+            <span class="text-gray-700">
+              <span class="font-medium">{{ item.plato.nombre }}</span>
+              <span class="text-gray-500">(x{{ item.cantidad }})</span>
+            </span>
+            <span class="font-medium text-gray-800">${{ item.subtotal|intcomma }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+      <span class="text-lg font-bold text-gray-900">Total Pagado:</span>
+      <span class="text-xl font-bold text-orange-600">${{ pedido.total|intcomma }}</span>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <a href="{% url 'pedidos:menu' %}" class="w-full sm:w-auto inline-flex justify-center py-2 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-500 hover:bg-orange-600">
+      Volver al Menú
+    </a>
+  </div>
+
+</section>
+{% endblock %}

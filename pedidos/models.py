@@ -31,6 +31,7 @@ class Plato(models.Model):
 
 class Pedido(models.Model):
     usuario = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='pedidos')
+    repartidor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='entregas')
     ESTADOS = [('PREP','Preparando'), ('CAM','En camino'), ('ENT','Entregado')]
     nombre = models.CharField(max_length=120)
     telefono = models.CharField(max_length=30)

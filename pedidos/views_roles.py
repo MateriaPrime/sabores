@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
+from django.contrib.auth import login, logout
 from django.contrib.auth import login
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -8,8 +9,8 @@ from .forms import SignupClienteForm
 from .models import Pedido 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .forms import SignupClienteForm, PlatoAdminForm # Importamos PlatoAdminForm
-from .models import Pedido, Plato # Importamos Plato
+from .forms import SignupClienteForm, PlatoAdminForm, SignupRepartidorForm, PerfilUpdateForm
+from .models import Pedido, Plato, Perfil
 
 def signup_cliente(request):
     if request.method == 'POST':
@@ -26,9 +27,7 @@ def signup_cliente(request):
 
 @login_required
 def dash_cliente(request):
-    # Cliente ve SOLO sus pedidos (si guardas nombre/teléfono en Pedido, lo ideal es relacionarlo al usuario)
     mis_pedidos = Pedido.objects.filter(usuario=request.user).order_by('-creado')
-    # Si prefieres, añade un FK: Pedido.usuario = ForeignKey(User, null=True) y filtra por usuario
     return render(request, 'pedidos/dash_cliente.html', {'pedidos': mis_pedidos})
 
 def is_repartidor(u):
@@ -37,19 +36,60 @@ def is_repartidor(u):
 @login_required
 @user_passes_test(is_repartidor)
 def dash_repartidor(request):
-    # Aquí solo entran REPARTIDORES
-    return render(request, 'pedidos/dash_repartidor.html')
+    
+    pedidos_disponibles = Pedido.objects.filter(
+        estado='PREP', 
+        repartidor__isnull=True
+    ).prefetch_related('items__plato').order_by('creado')
+
+    mis_pedidos = Pedido.objects.filter(
+        repartidor=request.user, 
+        estado='CAM'
+    ).prefetch_related('items__plato').order_by('creado')
+    
+    context = {
+        'pedidos_disponibles': pedidos_disponibles,
+        'mis_pedidos_aceptados': mis_pedidos
+    }
+    return render(request, 'pedidos/dash_repartidor.html', context)
+
+@login_required
+@user_passes_test(is_repartidor)
+def pedido_aceptar(request, pedido_id):
+    """
+    Esta vista se activa cuando un repartidor presiona "Aceptar".
+    """
+    pedido = get_object_or_404(Pedido, id=pedido_id, estado='PREP', repartidor__isnull=True)
+    
+    pedido.repartidor = request.user
+    pedido.estado = 'CAM'
+    pedido.save()
+    
+    messages.success(request, f"Pedido #{pedido.id} aceptado. ¡En camino!")
+    return redirect('pedidos:dash_repartidor')
+
+@login_required
+@user_passes_test(is_repartidor)
+def pedido_entregado(request, pedido_id):
+    """
+    Esta vista se activa cuando un repartidor presiona "Marcar como Entregado".
+    """
+    pedido = get_object_or_404(Pedido, id=pedido_id, repartidor=request.user, estado='CAM')
+    
+    pedido.estado = 'ENT'
+    
+    messages.success(request, f"Pedido #{pedido.id} marcado como entregado.")
+    return redirect('pedidos:dash_repartidor')
 
 def is_admin(u):
     """ Helper para chequear si el usuario es superuser """
     return u.is_authenticated and u.is_superuser
 
 @login_required
-@user_passes_test(is_admin) # Solo superusuarios
+@user_passes_test(is_admin)
 def plato_crear(request):
     """ Vista para CREAR un nuevo plato """
     if request.method == 'POST':
-        # Pasamos request.FILES para manejar la subida de la imagen
         form = PlatoAdminForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
@@ -64,10 +104,10 @@ def plato_crear(request):
     })
 
 @login_required
-@user_passes_test(is_admin) # Solo superusuarios
+@user_passes_test(is_admin)
 def plato_editar(request, pk):
     """ Vista para EDITAR un plato existente """
-    plato = get_object_or_404(Plato, pk=pk) # Obtenemos el plato
+    plato = get_object_or_404(Plato, pk=pk)
     if request.method == 'POST':
         form = PlatoAdminForm(request.POST, request.FILES, instance=plato)
         if form.is_valid():
@@ -75,7 +115,6 @@ def plato_editar(request, pk):
             messages.success(request, f"Plato '{plato.nombre}' actualizado.")
             return redirect('pedidos:menu')
     else:
-        # Creamos el form precargado con los datos del plato
         form = PlatoAdminForm(instance=plato) 
     
     return render(request, 'pedidos/plato_form.html', {
@@ -84,17 +123,69 @@ def plato_editar(request, pk):
     })
 
 @login_required
-@user_passes_test(is_admin) # Solo superusuarios
+@user_passes_test(is_admin) 
 def plato_eliminar(request, pk):
     """ Vista para ELIMINAR un plato """
     plato = get_object_or_404(Plato, pk=pk)
     if request.method == 'POST':
-        # Si el usuario confirma (vía POST), eliminamos
         nombre_plato = plato.nombre
         plato.delete()
         messages.success(request, f"Plato '{nombre_plato}' eliminado.")
         return redirect('pedidos:menu')
     
-    # Si es GET, mostramos la página de confirmación
     return render(request, 'pedidos/plato_confirm_delete.html', {'plato': plato})
-# --- FIN DE LAS NUEVAS VISTAS ---
+
+def signup_repartidor(request):
+    if request.method == 'POST':
+        form = SignupRepartidorForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            repartidor_group, _ = Group.objects.get_or_create(name='REPARTIDOR')
+            user.groups.add(repartidor_group)
+            
+            login(request, user)
+            return redirect('dashboard_router') 
+    else:
+        form = SignupRepartidorForm() 
+    
+    return render(request, 'pedidos/signup_repartidor.html', {'form': form})
+
+@login_required
+def perfil_editar(request):
+    """ Vista para que el cliente edite su nombre, apellido, dirección y teléfono. """
+    user_instance = request.user
+    
+    if request.method == 'POST':
+        form = PerfilUpdateForm(request.POST, instance=user_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tu perfil ha sido actualizado con éxito.")
+            return redirect('pedidos:dash_cliente')
+        else:
+            messages.error(request, "Hubo un error al actualizar tu perfil. Revisa los campos.")
+    else:
+        form = PerfilUpdateForm(instance=user_instance)
+    
+    return render(request, 'pedidos/perfil_form.html', {
+        'form': form,
+        'titulo': 'Editar mi perfil',
+    })
+
+
+@login_required
+def perfil_eliminar_confirmar(request):
+    """ 
+    Vista para: 1. Mostrar la confirmación (GET). 
+                2. Eliminar la cuenta (POST) y redirigir al login.
+    """
+    if request.method == 'POST':
+        user = request.user
+        
+        user.delete()
+        
+        logout(request)
+        
+        messages.success(request, "Tu cuenta ha sido eliminada con éxito. ¡Vuelve pronto!")
+        return redirect('pedidos:home')
+    
+    return render(request, 'pedidos/perfil_confirm_delete.html')
