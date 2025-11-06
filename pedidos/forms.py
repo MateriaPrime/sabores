@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .models import Plato, Perfil
 from django.core.validators import RegexValidator 
-
+from .models import Reseña
 # =========================================================================
 # VALIDADOR DE TELÉFONO (CORREGIDO: Fuerza el signo '+' inicial)
 # =========================================================================
@@ -17,10 +17,10 @@ telefono_validator = RegexValidator(
 )
 
 class PlatoAdminForm(forms.ModelForm):
+    # (Tu código de PlatoAdminForm queda igual, no se toca)
     imagen_archivo = forms.FileField(required=False, help_text="Sube imagen (se guarda en la BD)")
     
     class Meta:
-        # Definimos las variables de clases de Tailwind A DENTRO de Meta
         tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
         tailwind_select_classes = 'w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
         tailwind_textarea_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
@@ -49,6 +49,7 @@ class PlatoAdminForm(forms.ModelForm):
         return obj
 
 
+# --- [INICIO] MODIFICACIÓN DE SignupClienteForm ---
 class SignupClienteForm(UserCreationForm):
     tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
     
@@ -62,6 +63,13 @@ class SignupClienteForm(UserCreationForm):
         max_length=150,
         widget=forms.TextInput(attrs={'class': tailwind_input_classes})
     )
+    
+    # --- CAMBIO 1: Añadimos el campo email ---
+    email = forms.EmailField(
+        label="Correo Electrónico",
+        widget=forms.EmailInput(attrs={'class': tailwind_input_classes})
+    )
+    
     direccion  = forms.CharField(
         label="Dirección", 
         max_length=250,
@@ -87,7 +95,8 @@ class SignupClienteForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "direccion", "telefono", "password1", "password2")
+        # --- CAMBIO 2: Añadimos 'email' a la lista de campos ---
+        fields = ("username", "email", "first_name", "last_name", "direccion", "telefono", "password1", "password2")
         widgets = {
             'username': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'})
         }
@@ -108,6 +117,10 @@ class SignupClienteForm(UserCreationForm):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name  = self.cleaned_data["last_name"]
+        
+        # --- CAMBIO 3: Añadimos el guardado del email ---
+        user.email = self.cleaned_data["email"]
+
         if commit:
             user.save()
             perfil = user.perfil
@@ -115,9 +128,12 @@ class SignupClienteForm(UserCreationForm):
             perfil.telefono  = self.cleaned_data["telefono"]
             perfil.save()
         return user
+# --- [FIN] MODIFICACIÓN DE SignupClienteForm ---
 
 
 class LoginConRecordarmeForm(AuthenticationForm):
+    # (Tu código de LoginConRecordarmeForm queda igual, no se toca)
+    # ...
     tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
     tailwind_checkbox_classes = 'h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500'
 
@@ -143,7 +159,8 @@ class LoginConRecordarmeForm(AuthenticationForm):
 
 
 class SignupRepartidorForm(UserCreationForm):
-    
+    # (Tu código de SignupRepartidorForm ya estaba correcto, no se toca)
+    # ...
     tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
     
     first_name = forms.CharField(
@@ -155,6 +172,10 @@ class SignupRepartidorForm(UserCreationForm):
         label="Apellido", 
         max_length=150,
         widget=forms.TextInput(attrs={'class': tailwind_input_classes})
+    )
+    email = forms.EmailField(
+        label="Correo Electrónico",
+        widget=forms.EmailInput(attrs={'class': tailwind_input_classes})
     )
     telefono   = forms.CharField(
         label="Teléfono", 
@@ -175,7 +196,7 @@ class SignupRepartidorForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "telefono", "password1", "password2")
+        fields = ("username", "email", "first_name", "last_name", "telefono", "password1", "password2")
         
         widgets = {
             'username': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'})
@@ -197,6 +218,7 @@ class SignupRepartidorForm(UserCreationForm):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name  = self.cleaned_data["last_name"]
+        user.email = self.cleaned_data["email"] 
         if commit:
             user.save()
             perfil = user.perfil 
@@ -205,6 +227,8 @@ class SignupRepartidorForm(UserCreationForm):
         return user
     
 class PerfilUpdateForm(forms.ModelForm):
+    # (Tu código de PerfilUpdateForm queda igual, no se toca)
+    # ...
     tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
 
     first_name = forms.CharField(
@@ -251,3 +275,26 @@ class PerfilUpdateForm(forms.ModelForm):
         perfil.telefono = self.cleaned_data['telefono']
         perfil.save()
         return user
+    
+class ReseñaForm(forms.ModelForm):
+    # (Tu código de ReseñaForm queda igual, no se toca)
+    # ...
+    class Meta:
+        tailwind_select_classes = 'w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
+        tailwind_textarea_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
+
+
+        model = Reseña
+        fields = ['estrellas', 'comentario']
+        labels = {
+            'estrellas': 'Tu calificación',
+            'comentario': 'Tu reseña'
+        }
+        widgets = {
+            'estrellas': forms.Select(attrs={'class': tailwind_select_classes}),
+            'comentario': forms.Textarea(attrs={
+                'class': tailwind_textarea_classes, 
+                'rows': 4,
+                'placeholder': 'Escribe tu experiencia con Sabores...'
+            }),
+        }

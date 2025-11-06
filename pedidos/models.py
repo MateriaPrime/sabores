@@ -49,3 +49,29 @@ class ItemPedido(models.Model):
     cantidad = models.PositiveIntegerField(default=1)
     precio_unitario = models.IntegerField()
     def subtotal(self): return self.cantidad * self.precio_unitario
+
+class Reseña(models.Model):
+    ESTRELLAS = [
+        (5, '★★★★★'),
+        (4, '★★★★☆'),
+        (3, '★★★☆☆'),
+        (2, '★★☆☆☆'),
+        (1, '★☆☆☆☆'),
+    ]
+
+    # El usuario que escribió la reseña
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reseñas')
+    # La calificación en estrellas
+    estrellas = models.IntegerField(choices=ESTRELLAS, default=5)
+    # El comentario
+    comentario = models.TextField(max_length=500)
+    # La fecha de creación
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Ordenamos las reseñas por defecto (más nuevas primero)
+        ordering = ['-creado']
+        verbose_name_plural = 'Reseñas'
+
+    def __str__(self):
+        return f'Reseña de {self.usuario.username} ({self.estrellas} estrellas)'
