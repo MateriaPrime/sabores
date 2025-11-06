@@ -16,14 +16,11 @@ def add_to_cart(request, plato_id):
     """
 
     if not request.user.is_authenticated:
-        messages.warning(request, 'Necesitas una cuenta para hacer pedidos. Por favor, ingresa.')
         return redirect('login')
 
     cart = _get_cart(request)
     cart[str(plato_id)] = cart.get(str(plato_id), 0) + 1
     request.session.modified = True
-    
-    messages.success(request, 'Plato agregado al carrito.')
     
     return redirect(request.META.get('HTTP_REFERER', 'pedidos:menu'))
 

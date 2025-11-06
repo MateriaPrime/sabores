@@ -1,10 +1,20 @@
-# pedidos/forms.py
 from django import forms
 from .models import Plato
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .models import Plato, Perfil
+from django.core.validators import RegexValidator 
+
+# =========================================================================
+# VALIDADOR DE TELÉFONO (CORREGIDO: Fuerza el signo '+' inicial)
+# =========================================================================
+telefono_validator = RegexValidator(
+    # La nueva regla: ^ (inicio) \+ (debe ser un signo más) [0-9]+ (seguido de uno o más dígitos) $ (fin)
+    regex=r'^\+[0-9]+$',
+    message="El número de teléfono debe comenzar con '+' y solo puede contener números después.",
+    code='invalid_phone_number'
+)
 
 class PlatoAdminForm(forms.ModelForm):
     imagen_archivo = forms.FileField(required=False, help_text="Sube imagen (se guarda en la BD)")
@@ -19,7 +29,6 @@ class PlatoAdminForm(forms.ModelForm):
         model = Plato
         fields = ['categoria', 'nombre', 'descripcion', 'precio', 'destacado']
         
-        # Usamos las variables (sin comillas)
         widgets = {
             'categoria': forms.Select(attrs={'class': tailwind_select_classes}),
             'nombre': forms.TextInput(attrs={'class': tailwind_input_classes}),
@@ -61,6 +70,7 @@ class SignupClienteForm(UserCreationForm):
     telefono   = forms.CharField(
         label="Teléfono", 
         max_length=30,
+        validators=[telefono_validator], 
         widget=forms.TextInput(attrs={'class': tailwind_input_classes})
     )
 
@@ -132,7 +142,6 @@ class LoginConRecordarmeForm(AuthenticationForm):
     )
 
 
-# --- FORMULARIO DE REGISTRO PARA REPARTIDORES ---
 class SignupRepartidorForm(UserCreationForm):
     
     tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
@@ -150,6 +159,7 @@ class SignupRepartidorForm(UserCreationForm):
     telefono   = forms.CharField(
         label="Teléfono", 
         max_length=30,
+        validators=[telefono_validator], 
         widget=forms.TextInput(attrs={'class': tailwind_input_classes})
     )
 
@@ -167,12 +177,9 @@ class SignupRepartidorForm(UserCreationForm):
         model = User
         fields = ("username", "first_name", "last_name", "telefono", "password1", "password2")
         
-        # --- [INICIO] ESTA ES LA CORRECCIÓN ---
-        # Pegamos la cadena de texto aquí porque la variable no es visible
         widgets = {
             'username': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'})
         }
-        # --- [FIN] CORRECCIÓN ---
     
     def clean(self):
         try:
@@ -198,10 +205,8 @@ class SignupRepartidorForm(UserCreationForm):
         return user
     
 class PerfilUpdateForm(forms.ModelForm):
-    # Reutilizamos las clases de estilo de Tailwind
     tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
 
-    # Campos del modelo User (first_name y last_name)
     first_name = forms.CharField(
         label="Nombre", 
         max_length=150,
@@ -215,7 +220,6 @@ class PerfilUpdateForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': tailwind_input_classes})
     )
     
-    # Campos del modelo Perfil
     direccion  = forms.CharField(
         label="Dirección", 
         max_length=250,
@@ -224,6 +228,7 @@ class PerfilUpdateForm(forms.ModelForm):
     telefono   = forms.CharField(
         label="Teléfono", 
         max_length=30,
+        validators=[telefono_validator],
         widget=forms.TextInput(attrs={'class': tailwind_input_classes})
     )
 
@@ -234,16 +239,13 @@ class PerfilUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Precargar los campos de Perfil con la data existente
         if self.instance and hasattr(self.instance, 'perfil'):
             self.initial['direccion'] = self.instance.perfil.direccion
             self.initial['telefono'] = self.instance.perfil.telefono
 
     def save(self, commit=True):
-        # 1. Guardar campos de User
         user = super().save(commit=True)
         
-        # 2. Guardar campos de Perfil
         perfil = user.perfil
         perfil.direccion = self.cleaned_data['direccion']
         perfil.telefono = self.cleaned_data['telefono']
