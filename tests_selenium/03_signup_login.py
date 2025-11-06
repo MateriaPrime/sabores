@@ -172,7 +172,7 @@ def do_signup_cliente(drv):
         (By.CSS_SELECTOR, "#id_telefono"),
         (By.XPATH, "//input[@placeholder='Teléfono']"),
         (By.XPATH, "//label[normalize-space()='Teléfono']/following::input[1]"),
-    ], "999999999")
+    ], "+999999999")
 
     # password1 / password2
     fill([

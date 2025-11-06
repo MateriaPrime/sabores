@@ -3,6 +3,8 @@ from django.contrib import messages
 from .models import Categoria, Plato, Pedido, ItemPedido, ItemPedido, Reseña
 from .forms import ReseñaForm
 from django.http import HttpResponse, Http404
+from django.utils.encoding import smart_str
+from django.conf import settings
 
 def _get_cart(request):
     """
@@ -159,14 +161,21 @@ def order_detail(request, pedido_id):
 
 def plato_imagen(request, pk):
     """
-    Vista especial para servir las imágenes de los platos.
-    Lee los bytes de la imagen desde la BD y los devuelve como respuesta.
+    Sirve las imágenes de los platos desde bytes en BD.
+    Si no hay imagen, redirige a un placeholder estático.
     """
     plato = get_object_or_404(Plato, pk=pk)
-    if not plato.imagen_bytes:
-        raise Http404("Este plato no tiene imagen guardada")
-    
-    resp = HttpResponse(plato.imagen_bytes, content_type=plato.imagen_mime or 'image/jpeg')
-    
-    resp['Cache-Control'] = 'public, max-age=86400'
+
+    # Si no hay bytes, redirige al placeholder (cumple con el test)
+    if not getattr(plato, "imagen_bytes", None):
+        # Ajusta la ruta al placeholder según tu estructura de static
+        # Ejemplos: "img/placeholder.png" o "pedidos/img/placeholder.png"
+        return redirect(f"{settings.STATIC_URL}img/placeholder.png")
+
+    content_type = plato.imagen_mime or "image/jpeg"
+    resp = HttpResponse(plato.imagen_bytes, content_type=content_type)
+
+    # Opcional: nombre de archivo sugerido (descarga/buscadores)
+    resp["Content-Disposition"] = f'inline; filename="{smart_str(f"plato_{pk}.jpg")}"'
+    resp["Cache-Control"] = "public, max-age=86400"
     return resp

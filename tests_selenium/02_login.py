@@ -9,8 +9,8 @@ import time
 from pathlib import Path
 
 BASE_URL = "http://127.0.0.1:8000/"
-TEST_USER = "Talkies"        # <-- cambia por un user real
-TEST_PASS = "+84727160Talkies"    # <-- su pass
+TEST_USER = "diegogenial"        # <-- cambia por un user real
+TEST_PASS = "Perrajara21"    # <-- su pass
 
 def get_driver(headless=False):
     opts = Options()

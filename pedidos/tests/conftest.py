@@ -39,3 +39,19 @@ def carrito_lleno(client_logeado, plato, db):
         "La vista add_to_cart no pobló la sesión; revisa el nombre de la key (cart/carrito) y el parámetro de cantidad."
 
     return client_logeado
+
+@pytest.fixture
+def pedido(db, user):
+    # Ajusta campos reales de Pedido si difieren (ej. estado, direccion, etc.)
+    return baker.make("pedidos.Pedido", usuario=user, nombre="Pedido 1")
+
+@pytest.fixture
+def item(db, pedido, plato):
+    # Ajusta el nombre del campo de precio si en tu modelo es 'precio' en vez de 'precio_unitario'
+    return baker.make(
+        "pedidos.ItemPedido",
+        pedido=pedido,
+        plato=plato,
+        cantidad=2,
+        precio_unitario=Decimal("3500.00"),
+    )
