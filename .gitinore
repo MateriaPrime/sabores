@@ -16,3 +16,7 @@ env/
 
 # Pruebas
 .pytest_cache/
+
+# Python
+__pycache__/
+*.pyc
