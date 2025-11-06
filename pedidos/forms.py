@@ -4,6 +4,7 @@ from .models import Plato
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from .models import Plato, Perfil
 
 class PlatoAdminForm(forms.ModelForm):
     imagen_archivo = forms.FileField(required=False, help_text="Sube imagen (se guarda en la BD)")
@@ -194,4 +195,57 @@ class SignupRepartidorForm(UserCreationForm):
             perfil = user.perfil 
             perfil.telefono  = self.cleaned_data["telefono"]
             perfil.save()
+        return user
+    
+class PerfilUpdateForm(forms.ModelForm):
+    # Reutilizamos las clases de estilo de Tailwind
+    tailwind_input_classes = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm'
+
+    # Campos del modelo User (first_name y last_name)
+    first_name = forms.CharField(
+        label="Nombre", 
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={'class': tailwind_input_classes})
+    )
+    last_name  = forms.CharField(
+        label="Apellido", 
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={'class': tailwind_input_classes})
+    )
+    
+    # Campos del modelo Perfil
+    direccion  = forms.CharField(
+        label="Dirección", 
+        max_length=250,
+        widget=forms.TextInput(attrs={'class': tailwind_input_classes})
+    )
+    telefono   = forms.CharField(
+        label="Teléfono", 
+        max_length=30,
+        widget=forms.TextInput(attrs={'class': tailwind_input_classes})
+    )
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Precargar los campos de Perfil con la data existente
+        if self.instance and hasattr(self.instance, 'perfil'):
+            self.initial['direccion'] = self.instance.perfil.direccion
+            self.initial['telefono'] = self.instance.perfil.telefono
+
+    def save(self, commit=True):
+        # 1. Guardar campos de User
+        user = super().save(commit=True)
+        
+        # 2. Guardar campos de Perfil
+        perfil = user.perfil
+        perfil.direccion = self.cleaned_data['direccion']
+        perfil.telefono = self.cleaned_data['telefono']
+        perfil.save()
         return user

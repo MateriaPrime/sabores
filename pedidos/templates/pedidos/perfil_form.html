@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="container mx-auto max-w-lg p-8 my-10 bg-white shadow-lg rounded-lg">
+  
+  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">{{ titulo }}</h1>
+
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+    
+    {# Muestra errores no relacionados a campos #}
+    {% if form.non_field_errors %}
+      <div class="p-3 bg-red-100 border border-red-400 text-red-700 font-medium rounded-md">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {# Itera sobre todos los campos del formulario (first_name, last_name, direccion, telefono) #}
+    {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+        <div class="mt-1">
+          {{ field }}
+        </div>
+        {# Muestra errores de campo #}
+        {% if field.errors %}
+          <div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded-md">
+            {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+        {# Muestra texto de ayuda #}
+        {% if field.help_text %}
+          <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+      Guardar Cambios
+    </button>
+  </form>
+
+  <div class="text-sm text-center text-gray-600 mt-6">
+    <a href="{% url 'pedidos:dash_cliente' %}" class="font-medium text-stone-600 hover:text-stone-500">
+      Cancelar y volver a mi panel
+    </a>
+  </div>
+  
+  <div class="text-sm text-center mt-3">
+    <a href="{% url 'pedidos:perfil_eliminar_confirmar' %}" class="font-medium text-red-600 hover:text-red-500 underline">
+      Eliminar cuenta
+    </a>
+  </div>
+  </section>
+{% endblock %}

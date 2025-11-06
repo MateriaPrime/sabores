@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sabores - Taste the Difference</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'pedidos/css/custom.css' %}">
+</head>
+
+<body class="bg-stone-50 font-['Be_Vietnam_Pro','Noto_Sans',sans-serif]">
+  <div class="flex flex-col min-h-screen overflow-x-hidden">
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex h-20 items-center justify-between">
+          <a href="{% url 'pedidos:home' %}" class="flex items-center gap-3">
+            <img src="{% static 'pedidos/img/logo.png' %}" alt="Sabores" class="h-10 w-10 object-contain">
+            <h2 class="text-2xl font-bold text-stone-900 tracking-tight">Sabores</h2>
+          </a>
+
+          <nav class="hidden md:flex items-center gap-8">
+            <a href="{% url 'pedidos:home' %}" class="text-stone-700 hover:text-orange-500 font-medium">Home</a>
+            <a href="{% url 'pedidos:menu' %}" class="text-stone-700 hover:text-orange-500 font-medium">Menú</a>
+            <a href="#" class="text-stone-700 hover:text-orange-500 font-medium">Corporativo</a>
+            <a href="#" class="text-stone-700 hover:text-orange-500 font-medium">Contacto</a>
+          </nav>
+
+          <div class="flex items-center gap-3">
+            
+            <a href="{% url 'pedidos:cart' %}" 
+               class="bg-stone-100 text-stone-800 px-3 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition" 
+               title="Ver carrito">
+              <span class="material-symbols-outlined">
+                shopping_cart
+              </span>
+            </a>
+            <a href="{% url 'pedidos:menu' %}" class="hidden sm:flex items-center bg-orange-500 text-white px-5 h-11 rounded-lg font-bold shadow hover:bg-orange-600 transition">Ordenar</a>
+
+            {% if request.user.is_authenticated %}
+              <span class="hidden sm:inline text-sm text-stone-700">Hola, <strong>{{ request.user.username }}</strong></span>
+              <a href="{% url 'dashboard_router' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
+                Mi Panel
+              </a>
+              <a href="{% url 'logout' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
+                Salir
+              </a>
+            {% else %}
+              <a href="{% url 'login' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
+                Ingresar
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {% if messages %}
+    <div id="message-container" class="fixed top-24 right-4 z-[100] w-full max-w-sm space-y-2">
+        {% for message in messages %}
+        <div class="p-4 rounded-lg shadow-lg border-l-4 
+            {% if 'success' in message.tags %}bg-green-100 border-green-500 text-green-800
+            {% elif 'warning' in message.tags %}bg-yellow-100 border-yellow-500 text-yellow-800
+            {% elif 'error' in message.tags %}bg-red-100 border-red-500 text-red-800
+            {% else %}bg-stone-100 border-stone-500 text-stone-800{% endif %}" 
+            role="alert">
+            <div class="flex items-center">
+                {# Icono según el tipo de mensaje #}
+                <span class="material-symbols-outlined mr-2 
+                    {% if 'success' in message.tags %}text-green-500
+                    {% elif 'warning' in message.tags %}text-yellow-500
+                    {% elif 'error' in message.tags %}text-red-500
+                    {% else %}text-stone-500{% endif %}">
+                    {% if 'success' in message.tags %}check_circle{% elif 'error' in message.tags %}error{% else %}info{% endif %}
+                </span>
+                <div class="font-medium">{{ message }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <main class="flex-1">
+      {% block content %}{% endblock %}
+
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 py-8">
+      <div class="container mx-auto px-4 text-center text-stone-500 text-sm">
+        <p>© {% now "Y" %} Sabores. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const container = document.getElementById('message-container');
+          if (container) {
+              // Ocultar el contenedor de mensajes después de 5 segundos
+              setTimeout(() => {
+                  container.style.opacity = '0';
+                  container.style.transition = 'opacity 1s ease-out';
+                  
+                  // Eliminar del DOM después de la transición
+                  setTimeout(() => container.remove(), 1000); 
+              }, 5000);
+          }
+      });
+  </script>
+
+</body>
+</html>
