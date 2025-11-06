@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 from pedidos.models import Categoria, Plato, Pedido, ItemPedido
+from django.template.engine import Engine  # Importar Engine
 
 @pytest.fixture
 def categoria(db):
@@ -21,3 +22,13 @@ def pedido_con_items(db, plato):
     p = Pedido.objects.create(nombre="Cliente", telefono="123", direccion="Mi casa")
     ItemPedido.objects.create(pedido=p, plato=plato, cantidad=2, precio_unitario=plato.precio)
     return p
+
+# --- INICIO CORRECCIÓN 'intcomma' (Versión para Django 4.0+) ---
+@pytest.fixture(autouse=True)
+def humanize_patch():
+    try:
+        # Esta es la forma moderna de añadir built-ins
+        Engine.get_default().builtins.append('django.contrib.humanize.templatetags.humanize')
+    except Exception:
+        pass # Evita errores si ya está cargado
+# --- FIN CORRECCIÓN ---
