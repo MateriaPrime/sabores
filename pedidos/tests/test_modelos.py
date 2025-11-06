@@ -1,16 +1,12 @@
 import pytest
 from pedidos.models import Categoria, Plato, Pedido, ItemPedido
 
-@pytest.mark.django_db
-def test_total_de_pedido():
-    cat = Categoria.objects.create(nombre="Platos")
-    p1 = Plato.objects.create(categoria=cat, nombre="A", precio=3000)
-    p2 = Plato.objects.create(categoria=cat, nombre="B", precio=2000)
-    ped = Pedido.objects.create(nombre="X", telefono="123", direccion="Calle 1")
+def test_mo_002_item_subtotal(item):
+    assert item.subtotal() == item.cantidad * item.precio_unitario
 
-    # Act
-    ItemPedido.objects.create(pedido=ped, plato=p1, cantidad=2, precio_unitario=p1.precio)
-    ItemPedido.objects.create(pedido=ped, plato=p2, cantidad=1, precio_unitario=p2.precio)
+def test_mo_001_pedido_suma_total(pedido, item, db):
+    # crea otro item para el mismo pedido
+    from model_bakery import baker
+    other = baker.make("pedidos.ItemPedido", pedido=pedido, precio_unitario=1000, cantidad=3)
+    assert pedido.total() == item.subtotal() + other.subtotal()
 
-    # Assert
-    assert ped.total() == 8000
