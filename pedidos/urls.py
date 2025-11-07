@@ -26,6 +26,7 @@ urlpatterns = [
     path('plato/eliminar/<int:pk>/', views_roles.plato_eliminar, name='plato_eliminar'),
     path('signup/repartidor/', views_roles.signup_repartidor, name='signup_repartidor'),
     path('repartidor/aceptar/<int:pedido_id>/', views_roles.pedido_aceptar, name='pedido_aceptar'),
+     path('repartidor/rechazar/<int:pedido_id>/', views_roles.pedido_rechazar, name='pedido_rechazar'),
     path('repartidor/entregado/<int:pedido_id>/', views_roles.pedido_entregado, name='pedido_entregado'),
     path('contacto/', views.contacto, name='contacto'),
     path('reseñas/', views.reseñas, name='reseñas'),

@@ -84,12 +84,14 @@ class SignupClienteForm(UserCreationForm):
 
     password1 = forms.CharField(
         label=("Contraseña"),
-        widget=forms.PasswordInput,
+        # Añadimos el widget con las clases de Tailwind
+        widget=forms.PasswordInput(attrs={'class': tailwind_input_classes}),
         help_text=("Debe tener al menos 8 caracteres. Recomendamos usar mayúsculas, minúsculas, números y un carácter especial."),
     )
     password2 = forms.CharField(
         label=("Confirmar contraseña"),
-        widget=forms.PasswordInput,
+        # Añadimos el widget con las clases de Tailwind
+        widget=forms.PasswordInput(attrs={'class': tailwind_input_classes}),
         help_text=("Ingresa la misma contraseña para verificarla.")
     )
 
