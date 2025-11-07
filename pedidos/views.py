@@ -5,6 +5,7 @@ from .forms import ReseñaForm
 from django.http import HttpResponse, Http404
 from django.utils.encoding import smart_str
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 def _get_cart(request):
     """
@@ -151,13 +152,19 @@ def checkout(request):
 
     return redirect('pedidos:cart')
 
+@login_required
 def order_detail(request, pedido_id):
     """
     Muestra la página de "Orden Completada" con los detalles.
+    Ahora valida que el pedido le pertenezca al usuario logueado.
     """
-    pedido = get_object_or_404(Pedido, pk=pedido_id)
-    return render(request, 'pedidos/order_detail.html', {'pedido': pedido})
+    pedido = get_object_or_404(Pedido, pk=pedido_id, usuario=request.user)
+    
+    # Si el pedido_id existe pero no pertenece al request.user,
+    # get_object_or_404 lanzará un error 404 (No Encontrado),
+    # protegiendo los datos de otros usuarios.
 
+    return render(request, 'pedidos/order_detail.html', {'pedido': pedido})
 
 def plato_imagen(request, pk):
     """

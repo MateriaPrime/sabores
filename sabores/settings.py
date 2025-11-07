@@ -28,7 +28,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+allowed_hosts_string = os.getenv('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = allowed_hosts_string.split(',') if allowed_hosts_string else []
 
 
 # Application definition
@@ -148,9 +149,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Para demo
-DEBUG = True
-ALLOWED_HOSTS = []
+
 
 
 LOGIN_URL = 'login'
