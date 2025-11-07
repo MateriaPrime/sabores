@@ -136,7 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'pedidos' / 'static']   # para assets del proyecto
+STATICFILES_DIRS = []   # para assets del proyecto
 STATIC_ROOT = BASE_DIR / 'staticfiles'     # opcional (deploy)
 
 
