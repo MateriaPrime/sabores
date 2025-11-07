@@ -40,7 +40,7 @@ def dash_repartidor(request):
     pedidos_disponibles = Pedido.objects.filter(
         estado='PREP', 
         repartidor__isnull=True
-    ).prefetch_related('items__plato').order_by('creado')
+    ).prefetch_related('items__plato').exclude(repartidores_que_rechazaron=request.user).order_by('creado')
 
     mis_pedidos = Pedido.objects.filter(
         repartidor=request.user, 
@@ -66,6 +66,22 @@ def pedido_aceptar(request, pedido_id):
     pedido.save()
     
     messages.success(request, f"Pedido #{pedido.id} aceptado. ¡En camino!")
+    return redirect('pedidos:dash_repartidor')
+
+@login_required
+@user_passes_test(is_repartidor)
+def pedido_rechazar(request, pedido_id):
+    """
+    Esta vista se activa cuando un repartidor presiona "Rechazar".
+    Añade al repartidor a la lista de "rechazados" de ese pedido.
+    """
+    # Buscamos el pedido
+    pedido = get_object_or_404(Pedido, id=pedido_id, estado='PREP')
+    
+    # Añadimos al repartidor actual a la lista M2M de rechazados
+    pedido.repartidores_que_rechazaron.add(request.user)
+    
+    messages.info(request, f"Pedido #{pedido.id} rechazado. No se mostrará de nuevo.")
     return redirect('pedidos:dash_repartidor')
 
 @login_required

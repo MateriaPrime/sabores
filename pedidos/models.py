@@ -37,6 +37,11 @@ class Pedido(models.Model):
     telefono = models.CharField(max_length=30)
     direccion = models.CharField(max_length=250)
     creado = models.DateTimeField(auto_now_add=True)
+    repartidores_que_rechazaron = models.ManyToManyField(
+        User, 
+        blank=True, 
+        related_name='pedidos_rechazados'
+    )
     estado = models.CharField(max_length=4, choices=ESTADOS, default='PREP')
     estimado_min = models.PositiveIntegerField(default=30)
     estimado_max = models.PositiveIntegerField(default=45)

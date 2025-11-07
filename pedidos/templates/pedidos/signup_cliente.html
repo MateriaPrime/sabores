@@ -2,8 +2,7 @@
 {% block content %}
 <section class="container mx-auto max-w-lg p-8 my-10 bg-white shadow-lg rounded-lg">
   
-  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Crear cuenta (Cliente)</h1>
-
+  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Crear cuenta</h1>
   <form method="post" class="space-y-5">
     {% csrf_token %}
     
@@ -14,7 +13,6 @@
       </div>
     {% endif %}
 
-    <!-- Campo Usuario -->
     <div>
       <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Usuario</label>
       <div class="mt-1">
@@ -27,8 +25,6 @@
       {% endif %}
     </div>
 
-    <!-- === [INICIO] CÓDIGO NUEVO === -->
-    <!-- Campo Email -->
     <div>
       <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
       <div class="mt-1">
@@ -40,9 +36,7 @@
         </div>
       {% endif %}
     </div>
-    <!-- === [FIN] CÓDIGO NUEVO === -->
 
-    <!-- Fila Nombre y Apellido -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Nombre</label>
@@ -68,7 +62,6 @@
       </div>
     </div>
     
-    <!-- Campo Dirección -->
     <div>
       <label for="{{ form.direccion.id_for_label }}" class="block text-sm font-medium text-gray-700">Dirección</label>
       <div class="mt-1">
@@ -81,7 +74,6 @@
       {% endif %}
     </div>
     
-    <!-- Campo Teléfono -->
     <div>
       <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-medium text-gray-700">Teléfono</label>
       <div class="mt-1">
@@ -94,12 +86,10 @@
       {% endif %}
     </div>
 
-    <!-- Campo Contraseña 1 -->
     <div>
       <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Contraseña</label>
       <div class="mt-1">
-        {{ form.password1 }}
-      </div>
+        {{ form.password1 }} </div>
       {% if form.password1.errors %}
         <div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded-md">
           {% for error in form.password1.errors %}<p>{{ error }}</p>{% endfor %}
@@ -110,12 +100,10 @@
       {% endif %}
     </div>
 
-    <!-- Campo Contraseña 2 -->
     <div>
       <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
       <div class="mt-1">
-        {{ form.password2 }}
-      </div>
+        {{ form.password2 }} </div>
       {% if form.password2.errors %}
         <div class="mt-1 p-2 text-sm bg-red-100 text-red-700 rounded-md">
           {% for error in form.password2.errors %}<p>{{ error }}</p>{% endfor %}
