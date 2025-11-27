@@ -30,4 +30,5 @@ urlpatterns = [
     path('repartidor/entregado/<int:pedido_id>/', views_roles.pedido_entregado, name='pedido_entregado'),
     path('contacto/', views.contacto, name='contacto'),
     path('reseñas/', views.reseñas, name='reseñas'),
+    path('mi-cuenta/cargar/', views_roles.cargar_saldo, name='cargar_saldo'),
 ]

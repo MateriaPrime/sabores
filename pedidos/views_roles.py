@@ -36,15 +36,24 @@ def is_repartidor(u):
 @login_required
 @user_passes_test(is_repartidor)
 def dash_repartidor(request):
-    
+    """
+    Panel del repartidor. Muestra pedidos disponibles y pedidos en curso.
+    """
+    # 1. Pedidos disponibles (en preparación y sin repartidor)
+    # Excluye los que este usuario haya rechazado previamente
     pedidos_disponibles = Pedido.objects.filter(
         estado='PREP', 
         repartidor__isnull=True
-    ).prefetch_related('items__plato').exclude(repartidores_que_rechazaron=request.user).order_by('creado')
+    ).exclude(
+        repartidores_que_rechazaron=request.user
+    ).prefetch_related('items__plato').order_by('creado')
 
+    # 2. Mis pedidos (los que acepté)
+    # IMPORTANTE: Filtramos por estado='CAM'. 
+    # Esto hace que los pedidos 'ENT' (Entregados) desaparezcan de la lista.
     mis_pedidos = Pedido.objects.filter(
         repartidor=request.user, 
-        estado='CAM'
+        estado='CAM' 
     ).prefetch_related('items__plato').order_by('creado')
     
     context = {
@@ -52,6 +61,27 @@ def dash_repartidor(request):
         'mis_pedidos_aceptados': mis_pedidos
     }
     return render(request, 'pedidos/dash_repartidor.html', context)
+
+@login_required
+def cargar_saldo(request):
+    """
+    Simula una carga de dinero a la billetera del usuario.
+    """
+    if request.method == 'POST':
+        try:
+            monto = int(request.POST.get('monto', 0))
+            if monto > 0:
+                # Sumamos el monto al saldo del perfil
+                perfil = request.user.perfil
+                perfil.saldo += monto
+                perfil.save()
+                messages.success(request, f"¡Carga exitosa! Se han añadido ${monto} a tu billetera.")
+            else:
+                messages.error(request, "El monto debe ser mayor a 0.")
+        except ValueError:
+            messages.error(request, "Monto inválido.")
+            
+    return redirect('pedidos:dash_cliente')
 
 @login_required
 @user_passes_test(is_repartidor)
@@ -88,11 +118,13 @@ def pedido_rechazar(request, pedido_id):
 @user_passes_test(is_repartidor)
 def pedido_entregado(request, pedido_id):
     """
-    Esta vista se activa cuando un repartidor presiona "Marcar como Entregado".
+    Marca el pedido como entregado.
     """
     pedido = get_object_or_404(Pedido, id=pedido_id, repartidor=request.user, estado='CAM')
     
-    pedido.estado = 'ENT'
+    # Cambiamos el estado a 'ENT' (Entregado)
+    pedido.estado = 'ENT' 
+    pedido.save()
     
     messages.success(request, f"Pedido #{pedido.id} marcado como entregado.")
     return redirect('pedidos:dash_repartidor')

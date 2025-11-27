@@ -5,6 +5,7 @@ class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
     direccion = models.CharField(max_length=250, blank=True)
     telefono = models.CharField(max_length=30, blank=True)
+    saldo = models.IntegerField(default=0, help_text="Dinero disponible en la billetera")
 
     def __str__(self):
         return f'Perfil de {self.user.username}'

@@ -13,10 +13,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
   <link rel="stylesheet" href="{% static 'pedidos/css/custom.css' %}">
+
+  <style>
+    .toast-container {
+      position: fixed;
+      top: 5rem; /* Un poco más abajo del header */
+      right: 1rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .toast {
+      animation: slideIn 0.3s ease-out forwards;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .fade-out {
+      animation: fadeOut 0.5s ease-in forwards;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(100%); }
+    }
+  </style>
 </head>
 
 <body class="bg-stone-50 font-['Be_Vietnam_Pro','Noto_Sans',sans-serif]">
   <div class="flex flex-col min-h-screen overflow-x-hidden">
+    
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
       <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-20 items-center justify-between">
@@ -26,40 +53,76 @@
           </a>
 
           <nav class="hidden md:flex items-center gap-8">
-            <a href="{% url 'pedidos:home' %}" ...>Home</a>
-            <a href="{% url 'pedidos:menu' %}" ...>Menú</a>
+            <a href="{% url 'pedidos:home' %}" class="text-stone-700 hover:text-orange-500 font-medium">Home</a>
+            <a href="{% url 'pedidos:menu' %}" class="text-stone-700 hover:text-orange-500 font-medium">Menú</a>
             <a href="{% url 'pedidos:reseñas' %}" class="text-stone-700 hover:text-orange-500 font-medium">Reseñas</a>
-            <a href="{% url 'pedidos:contacto' %}" ...>Contacto</a>
+            <a href="{% url 'pedidos:contacto' %}" class="text-stone-700 hover:text-orange-500 font-medium">Contacto</a>
           </nav>
 
           <div class="flex items-center gap-3">
-            
             <a href="{% url 'pedidos:cart' %}" 
-               class="bg-stone-100 text-stone-800 px-3 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition" 
+               class="relative bg-stone-100 text-stone-800 px-3 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition" 
                title="Ver carrito">
-              <span class="material-symbols-outlined">
-                shopping_cart
-              </span>
+              <span class="material-symbols-outlined">shopping_cart</span>
+              {% if cart_total_items > 0 %}
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                  {{ cart_total_items }}
+                </span>
+              {% endif %}
             </a>
+
             <a href="{% url 'pedidos:menu' %}" class="hidden sm:flex items-center bg-orange-500 text-white px-5 h-11 rounded-lg font-bold shadow hover:bg-orange-600 transition">Ordenar</a>
 
             {% if request.user.is_authenticated %}
               <span class="hidden sm:inline text-sm text-stone-700">Hola, <strong>{{ request.user.username }}</strong></span>
+              
               <a href="{% url 'dashboard_router' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
-                Mi Panel
+                {% if is_cliente %}
+                  Mi Cartera
+                {% else %}
+                  Mi Panel
+                {% endif %}
               </a>
-              <a href="{% url 'logout' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
-                Salir
-              </a>
+              <a href="{% url 'logout' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">Salir</a>
             {% else %}
-              <a href="{% url 'login' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">
-                Ingresar
-              </a>
+              <a href="{% url 'login' %}" class="bg-stone-100 text-stone-800 px-5 h-11 flex items-center justify-center rounded-lg font-bold hover:bg-stone-200 transition">Ingresar</a>
             {% endif %}
           </div>
         </div>
       </div>
     </header>
+
+    {% if messages %}
+      <div class="toast-container" id="toast-container">
+        {% for message in messages %}
+          <div class="toast flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 border-l-4 
+            {% if message.tags == 'success' %} border-green-500 {% elif message.tags == 'error' %} border-red-500 {% else %} border-blue-500 {% endif %}" role="alert">
+            
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg 
+              {% if message.tags == 'success' %} text-green-500 bg-green-100 {% elif message.tags == 'error' %} text-red-500 bg-red-100 {% else %} text-blue-500 bg-blue-100 {% endif %}">
+              <span class="material-symbols-outlined text-sm">
+                {% if message.tags == 'success' %} check {% elif message.tags == 'error' %} error {% else %} info {% endif %}
+              </span>
+            </div>
+            <div class="ml-3 text-sm font-normal text-gray-800">{{ message }}</div>
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" aria-label="Close" onclick="this.parentElement.remove()">
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+
+      <script>
+        // Auto-eliminar notificaciones después de 4 segundos
+        setTimeout(() => {
+          const toasts = document.querySelectorAll('.toast');
+          toasts.forEach(toast => {
+            toast.classList.add('fade-out');
+            toast.addEventListener('animationend', () => toast.remove());
+          });
+        }, 4000);
+      </script>
+    {% endif %}
 
     <main class="flex-1">
       {% block content %}{% endblock %}
