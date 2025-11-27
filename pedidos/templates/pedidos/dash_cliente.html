@@ -12,99 +12,100 @@
     </div>
   </div>
 
+  {% if messages %}
+    <div class="mb-8">
+      {% for message in messages %}
+        <div class="p-4 rounded-lg text-sm font-medium border-l-4 shadow-sm
+          {% if message.tags == 'success' %} bg-green-50 text-green-800 border-green-500
+          {% else %} bg-red-50 text-red-800 border-red-500 {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     
     <div class="lg:col-span-1">
       
-      {% if messages %}
-        <div class="mb-4">
-          {% for message in messages %}
-            <div class="p-3 rounded-lg text-sm font-medium
-              {% if message.tags == 'success' %} bg-green-100 text-green-800
-              {% else %} bg-red-100 text-red-800 {% endif %}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
+      <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg transform hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+        
+        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
+        <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-white opacity-10"></div>
 
-      <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg mb-6 transform hover:scale-105 transition-transform duration-300">
-        <div class="flex justify-between items-start">
+        <div class="flex justify-between items-start relative z-10">
           <div>
-            <p class="text-orange-100 text-sm font-medium uppercase tracking-wider">Sabores Wallet</p>
+            <p class="text-orange-100 text-xs font-bold uppercase tracking-widest">Sabores Wallet</p>
             <h2 class="text-4xl font-bold mt-2">${{ request.user.perfil.saldo|intcomma }}</h2>
           </div>
           <span class="material-symbols-outlined text-4xl opacity-50">account_balance_wallet</span>
         </div>
-        <div class="mt-8 flex justify-between items-end">
+        
+        <div class="mt-10 flex justify-between items-end relative z-10">
           <div>
-            <p class="text-xs text-orange-100 uppercase">Titular</p>
-            <p class="font-medium tracking-wide">{{ request.user.first_name }} {{ request.user.last_name }}</p>
+            <p class="text-[10px] text-orange-200 uppercase mb-1">Titular</p>
+            <p class="font-medium tracking-wide text-lg">{{ request.user.first_name }} {{ request.user.last_name }}</p>
           </div>
-          <img src="{% static 'pedidos/img/logo.png' %}" class="h-8 opacity-80 filter brightness-0 invert" alt="Logo">
+          <img src="{% static 'pedidos/img/logo.png' %}" class="h-8 opacity-90 filter brightness-0 invert" alt="Logo">
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
-        <h3 class="font-bold text-stone-800 mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-green-600">add_card</span>
-          Cargar Saldo
-        </h3>
-        
-        <form action="{% url 'pedidos:cargar_saldo' %}" method="POST" class="space-y-3" id="form-carga">
-          {% csrf_token %}
-          <div>
-            <label class="text-xs text-stone-500 font-bold uppercase">Monto a cargar</label>
-            <div class="relative mt-1">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-500">$</span>
-              <input type="number" name="monto" id="input-monto" required min="1000" step="1000" placeholder="Ej: 10000"
-                     class="pl-7 w-full border-stone-300 rounded-lg focus:ring-orange-500 focus:border-orange-500">
-            </div>
-          </div>
-          
-          <button type="button" onclick="abrirModalCarga()" class="w-full bg-stone-900 text-white py-2 rounded-lg font-bold hover:bg-stone-800 transition">
-            Cargar Ahora
-          </button>
-        </form>
+      <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm text-blue-800 flex gap-3">
+        <span class="material-symbols-outlined text-blue-500">info</span>
+        <p>Para recargar saldo, por favor contacta a la administración.</p>
       </div>
+
     </div>
 
     <div class="lg:col-span-2">
-      <h2 class="text-2xl font-bold text-stone-800 mb-6">Mis Pedidos Recientes</h2>
+      <h2 class="text-2xl font-bold text-stone-800 mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-orange-500">history</span>
+        Mis Pedidos Recientes
+      </h2>
       
       {% if pedidos %}
         <div class="space-y-4">
           {% for pedido in pedidos %}
-            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row justify-between items-center gap-4">
+              
               <div>
                 <div class="flex items-center gap-3">
                   <span class="text-lg font-bold text-stone-900">Pedido #{{ pedido.id }}</span>
+                  
                   {% if pedido.estado == 'PREP' %}
-                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded">Preparando</span>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded border border-blue-200">Preparando</span>
                   {% elif pedido.estado == 'CAM' %}
-                    <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2.5 py-0.5 rounded">En Camino</span>
+                    <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2.5 py-0.5 rounded border border-yellow-200">En Camino</span>
                   {% else %}
-                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded">Entregado</span>
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded border border-green-200">Entregado</span>
                   {% endif %}
                 </div>
-                <p class="text-stone-500 text-sm mt-1">{{ pedido.creado|naturaltime }}</p>
-                <p class="text-stone-600 text-sm mt-2">
-                  {{ pedido.items.count }} platos • <strong>${{ pedido.total|intcomma }}</strong>
+                <p class="text-stone-500 text-sm mt-1 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs">schedule</span>
+                  {{ pedido.creado|naturaltime }}
+                </p>
+                <p class="text-stone-600 text-sm mt-2 font-medium">
+                  {{ pedido.items.count }} platos • <span class="text-stone-900">${{ pedido.total|intcomma }}</span>
                 </p>
               </div>
+
               <a href="{% url 'pedidos:order_detail' pedido.id %}" 
-                 class="text-orange-600 font-semibold hover:text-orange-700 hover:underline text-sm">
+                 class="inline-flex items-center gap-1 text-orange-600 font-semibold hover:text-orange-700 hover:bg-orange-50 px-3 py-2 rounded-lg transition">
                 Ver Detalles
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="text-center py-12 bg-stone-50 rounded-xl border-2 border-dashed border-stone-200">
-          <span class="material-symbols-outlined text-4xl text-stone-300 mb-2">soup_kitchen</span>
-          <p class="text-stone-500 font-medium">Aún no has realizado ningún pedido.</p>
-          <a href="{% url 'pedidos:menu' %}" class="text-orange-500 font-bold hover:underline mt-2 inline-block">
-            ¡Ir al Menú!
+        <div class="text-center py-16 bg-stone-50 rounded-xl border-2 border-dashed border-stone-200">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-100 mb-4">
+            <span class="material-symbols-outlined text-3xl text-stone-400">restaurant_menu</span>
+          </div>
+          <h3 class="text-lg font-medium text-stone-900">Aún no has pedido nada</h3>
+          <p class="text-stone-500 mt-1">¿Tienes hambre? Revisa nuestro menú.</p>
+          <a href="{% url 'pedidos:menu' %}" class="mt-4 inline-flex items-center justify-center px-5 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition">
+            Ir al Menú
           </a>
         </div>
       {% endif %}
@@ -112,72 +113,4 @@
 
   </div>
 </section>
-
-<div id="modal-carga" class="hidden fixed z-50 inset-0 overflow-y-auto">
-  <div class="flex items-center justify-center min-h-screen px-4 text-center">
-    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-      <div class="absolute inset-0 bg-black opacity-50"></div>
-    </div>
-
-    <div class="inline-block bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-sm sm:w-full z-10">
-      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-        <div class="sm:flex sm:items-start">
-          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-            <span class="material-symbols-outlined text-green-600">attach_money</span>
-          </div>
-          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-            <h3 class="text-lg leading-6 font-bold text-gray-900">Confirmar Recarga</h3>
-            <div class="mt-2">
-              <p class="text-sm text-gray-600">
-                ¿Estás seguro de que quieres cargar 
-                <strong class="text-green-600 text-lg block mt-1" id="monto-visual">$0</strong>
-                a tu billetera Sabores?
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-        <button type="button" onclick="confirmarCarga()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm">
-          Sí, cargar dinero
-        </button>
-        <button type="button" onclick="cerrarModalCarga()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-          Cancelar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  const modalCarga = document.getElementById('modal-carga');
-  const formCarga = document.getElementById('form-carga');
-  const inputMonto = document.getElementById('input-monto');
-  const montoVisual = document.getElementById('monto-visual');
-
-  function abrirModalCarga() {
-    const valor = inputMonto.value;
-    
-    // Validación básica: Si no hay monto o es menor o igual a 0
-    if (!valor || parseInt(valor) <= 0) {
-      alert("Por favor, ingresa un monto válido.");
-      return;
-    }
-
-    // Actualizamos el texto del modal con el monto ingresado
-    montoVisual.innerText = '$' + parseInt(valor).toLocaleString('es-CL');
-    
-    // Mostramos el modal
-    modalCarga.classList.remove('hidden');
-  }
-
-  function cerrarModalCarga() {
-    modalCarga.classList.add('hidden');
-  }
-
-  function confirmarCarga() {
-    formCarga.submit();
-  }
-</script>
-
 {% endblock %}

@@ -34,5 +34,7 @@ urlpatterns = [
     path('mi-cuenta/cargar/', views_roles.cargar_saldo, name='cargar_saldo'),
     path("panel/usuarios/", admin_views.gestionar_usuarios, name="gestionar_usuarios"),
     path("panel/cambiar-password/", admin_views.cambiar_password_admin, name="cambiar_password_admin"),
+    path("panel/cartera/<int:user_id>/", admin_views.admin_ver_cartera, name="admin_ver_cartera"),
+    path("panel/usuarios/eliminar/<int:user_id>/", admin_views.admin_eliminar_usuario, name="admin_eliminar_usuario"),
 
 ]
