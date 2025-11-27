@@ -8,6 +8,8 @@ __pycache__/
 db.sqlite3
 
 # Entorno virtual
+.env
+.venv
 venv/
 env/
 
@@ -17,9 +19,6 @@ env/
 # Pruebas
 .pytest_cache/
 
-# Python
-__pycache__/
-*.pyc
+# Base de datos (si usas SQLite)
+db.sqlite3
 
-# Archivo de secretos
-+ .env
