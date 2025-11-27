@@ -19,7 +19,7 @@ from django.urls import path, include
 from pedidos import views_auth
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     path('', include('pedidos.urls')),
 
     path('login/', views_auth.SaboresLoginView.as_view(), name='login'),

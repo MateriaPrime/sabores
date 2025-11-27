@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views
 from . import views, views_auth, views_roles
+from . import admin_views
 
 app_name = 'pedidos'
 
@@ -31,4 +32,7 @@ urlpatterns = [
     path('contacto/', views.contacto, name='contacto'),
     path('reseñas/', views.reseñas, name='reseñas'),
     path('mi-cuenta/cargar/', views_roles.cargar_saldo, name='cargar_saldo'),
+    path("panel/usuarios/", admin_views.gestionar_usuarios, name="gestionar_usuarios"),
+    path("panel/cambiar-password/", admin_views.cambiar_password_admin, name="cambiar_password_admin"),
+
 ]
